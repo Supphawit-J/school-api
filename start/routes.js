@@ -26,6 +26,10 @@ Route.group(() => {
   Route.get('/teachers/:id','TeacherCOntroller.show')
   Route.post('/teachers','TeacherController.store')
 
+  Route.get('/groups','GroupController.index')
+  Route.get('/groups','GroupController.show')
+  Route.post('/groups','GroupController.store')
+
 
 
 }).prefix('api/v1')
