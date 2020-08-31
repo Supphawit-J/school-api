@@ -1,7 +1,5 @@
 'use strict'
 
-
-
 function numberTypeParamValidator(number){
     if (Number.isNaN(parseInt(number))) 
         return { error: `param: ${number} is not supported, please use param as a number` }
@@ -9,13 +7,12 @@ function numberTypeParamValidator(number){
   return {}      
 }
 
-
-class GroupController {
+class EnrollmentController {
 
     async index() {
-        const groups = await Database.table('groups')
+        const enrollments = await Database.table('enrollments')
 
-        return { status: 200, error: undefined , data: groups
+        return { status: 200, error: undefined , data: enrollments
          }
     }
 
@@ -27,35 +24,34 @@ class GroupController {
         if (validatedValue.error) 
             return { status: 500, error: validatedValue.error, data: undefined }
 
-        const group = await Database
+        const enrollment = await Database
             .select('*')
-            .from('groups')
-            .where("group_id",id)
+            .from('enrollments')
+            .where("enrollment_id",id)
             .first()
 
-        return { status: 200, error: undefined , data: group || {} }
+        return { status: 200, error: undefined , data: enrollment || {} }
         
     }
     async store ({request}) {
-        const { name }  = request.body
+        const { mark }  = request.body
 
         const missingKeys = [] 
 
-        if (!name) {missingKeys.push('first_name')}
-        
+        if (!mark) {missingKeys.push('mark')}
+    
 
         if(missingKeys.length)
             return {status: 422 , error: `${missingKeys} is missing.`, data: undefined}
 
 
 
-        const group = await Database
-            .table('groups')
-            .insert({name})
+        const enrollmemt = await Database
+            .table('enrollments')
+            .insert({mark})
 
-        return group
+        return enrollmemt
     }
-
 }
 
-module.exports = GroupController
+module.exports = EnrollmentController
