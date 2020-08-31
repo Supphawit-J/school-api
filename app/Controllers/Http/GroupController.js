@@ -1,6 +1,6 @@
 'use strict'
 
-
+const Database = use('Database')
 
 function numberTypeParamValidator(number){
     if (Number.isNaN(parseInt(number))) 
@@ -41,7 +41,7 @@ class GroupController {
 
         const missingKeys = [] 
 
-        if (!name) {missingKeys.push('first_name')}
+        if (!name) {missingKeys.push('name')}
         
 
         if(missingKeys.length)

@@ -23,23 +23,23 @@ Route.get('/', () => {
 Route.group(() => {
   //start api
   Route.get('/teachers','TeacherController.index')
-  Route.get('/teachers/:id','TeacherCOntroller.show')
+  Route.get('/teachers/:id','TeacherController.show')
   Route.post('/teachers','TeacherController.store')
 
   Route.get('/groups','GroupController.index')
-  Route.get('/groups','GroupController.show')
+  Route.get('/groups/:id','GroupController.show')
   Route.post('/groups','GroupController.store')
 
   Route.get('/students','StudentController.index')
-  Route.get('/students','StudentController.show')
+  Route.get('/students/:id','StudentController.show')
   Route.post('/students','StudentController.store')
 
   Route.get('/enrollments','EnrollmentController.index')
-  Route.get('/enrollments','EnrollmentController.show')
+  Route.get('/enrollments/:id','EnrollmentController.show')
   Route.post('/enrollments','EnrollmentController.store')
 
   Route.get('/subjects','SubjectController.index')
-  Route.get('/subjects','SubjectController.show')
+  Route.get('/subjects/:id','SubjectController.show')
   Route.post('/subjects','SubjectController.store')
 
 

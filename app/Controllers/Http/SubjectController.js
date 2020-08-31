@@ -38,7 +38,7 @@ class SubjectController {
 
         const missingKeys = [] 
 
-        if (!title) {missingKeys.push('first_name')}
+        if (!title) {missingKeys.push('title')}
         
 
         if(missingKeys.length)
