@@ -1,5 +1,14 @@
 'use strict'
 
+
+function numberTypeParamValidator(number){
+    if (Number.isNaN(parseInt(number))) 
+        return { error: `param: ${number} is not supported, please use param as a number` }
+        
+  return {}      
+}
+
+
 class GroupController {
 
     async index() {
