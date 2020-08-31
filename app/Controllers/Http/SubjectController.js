@@ -1,5 +1,7 @@
 'use strict'
 
+const Database = use('Database')
+
 function numberTypeParamValidator(number){
     if (Number.isNaN(parseInt(number))) 
         return { error: `param: ${number} is not supported, please use param as a number` }
