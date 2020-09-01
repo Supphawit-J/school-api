@@ -19,7 +19,6 @@ class TeacherController {
         return { status: 200, error: undefined , data: teachers
          }
     }
-
     async show({ request }){
         const { id } = request.params
 
@@ -59,6 +58,35 @@ class TeacherController {
 
         return teacher
     }
+    async update ({request}){
+
+        const {body, params} = request
+        const {id} =params
+        const { first_name , last_name , email } = body
+
+        const teacherId = await Database
+            .table('teachers')
+            .where({teacher_id: id})
+            .update({ first_name , last_name , email})
+ 
+        const teacher = await Database
+            .table('teachers')
+            .where({teacher_id: teacherId})
+            .first()
+
+            return {status: 200 , error: undefined, data: teacher
+            }
+
+    }
+    async destroy ({request}){
+        const {id} = request.params
+
+        await Database.table('teachers').where({teacher_id: id }).delete()
+        return {status: 200,error: undefined, data: {message: 'success'}}
+
+
+    }
+
 
 }
 
