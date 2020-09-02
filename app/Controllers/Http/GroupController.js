@@ -2,6 +2,7 @@
 
 const Database = use('Database')
 const Validator = use("Validator")
+const Group = use('App/Models/Group')
 
 function numberTypeParamValidator(number){
     if (Number.isNaN(parseInt(number))) 
@@ -14,9 +15,12 @@ function numberTypeParamValidator(number){
 class GroupController {
 
     async index() {
-        const groups = await Database.table('groups')
+        
+        const groups = Group.query()
+        
+        
 
-        return { status: 200, error: undefined , data: groups
+        return { status: 200, error: undefined , data: await groups.fetch()
          }
     }
 
@@ -28,11 +32,7 @@ class GroupController {
         if (validatedValue.error) 
             return { status: 500, error: validatedValue.error, data: undefined }
 
-        const group = await Database
-            .select('*')
-            .from('groups')
-            .where("group_id",id)
-            .first()
+        const group = await Group.find(id)
 
         return { status: 200, error: undefined , data: group || {} }
         
@@ -48,13 +48,10 @@ class GroupController {
             return {status:422,error: validation.messages(),data: undefined}
 
 
+        const group = new Group();
+        group.name =name;
 
-
-        const group = await Database
-            .table('groups')
-            .insert({name})
-
-        return group
+        await group.save()
     }
 
     async update ({request}){
@@ -63,26 +60,17 @@ class GroupController {
         const {id} =params
         const {name} = body
 
-        const groupId = await Database
-            .table('groups')
-            .where({group_id: id})
-            .update({ name })
- 
-        const group = await Database
-            .table('groups')
-            .where({group_id: groupId})
-            .first()
+        const group = await Group.find(id)
 
-            return {status: 200 , error: undefined, data: group
-            }
+        group.merge({name:name})
+        await group.save()
 
     }
     async destroy ({request}){
         const {id} = request.params
 
-        await Database.table('groups').where({group_id: id }).delete()
-        return {status: 200,error: undefined, data: {message: 'success'}}
-
+        const group = await Group.find(id)
+        await group.delete()
 
     }
 }
