@@ -2,6 +2,7 @@
 
 const Database = use('Database')
 const Validator = use("Validator")
+const Subject = use('App/Models/Subject')
 
 
 function numberTypeParamValidator(number){
@@ -13,32 +14,40 @@ function numberTypeParamValidator(number){
 
 class SubjectController {
 
-    async index() {
-        const subjects = await Database.table('subjects')
+    async index({request}) {
 
-        return { status: 200, error: undefined , data: subjects
-         }
+        const {references = undefined} =request.qs
+        const subjects =  Subject.query()
+
+        if (references){
+            const extractedReferences = references.split(",")
+            subjects.with(extractedReferences)
+        }
+
+
+        return { status: 200, error: undefined , data: await subjects.fetch() }
+
     }
 
     async show({ request }){
-        const { id } = request.params
 
+        const { id } = request.params
         const validatedValue = numberTypeParamValidator(id)
 
         if (validatedValue.error) 
             return { status: 500, error: validatedValue.error, data: undefined }
 
-        const subject = await Database
-            .select('*')
-            .from('subjects')
-            .where("subject_id",id)
-            .first()
+        const subject = await Subject.find(id)
+    
+
 
         return { status: 200, error: undefined , data: subject || {} }
         
     }
+
     async store ({request}) {
-        const { title }  = request.body
+
+        const { title , teacher_id }  = request.body
 
         const rules = {title:'required'}
 
@@ -47,41 +56,31 @@ class SubjectController {
         if(validation.fails())
             return {status:422,error: validation.messages(),data: undefined}
 
+        
+        const subject = new Subject();
+        subject.title = title;
+        subject.teacher_id = teacher_id;
 
-
-
+        await subject.save()
     
-        const subject = await Database
-            .table('subjects')
-            .insert({title})
-
-        return subject
     }
     async update ({request}){
 
         const {body, params} = request
-        const {id} =params
-        const { title } = body
+        const {id} = params
+        const { title ,teacher_id } = body
+        const subject = await Subject.find(id)
 
-        const subjectId = await Database
-            .table('subjects')
-            .where({subject_id: id})
-            .update({title})
- 
-        const subject = await Database
-            .table('subjects')
-            .where({subject_id: subjectId})
-            .first()
-
-            return {status: 200 , error: undefined, data: subject
-            }
+        subject.merge({title: title , teacher_id: teacher_id})
+         await subject.save()
 
     }
     async destroy ({request}){
         const {id} = request.params
 
-        await Database.table('subjects').where({subject_id: id }).delete()
-        return {status: 200,error: undefined, data: {message: 'success'}}
+       
+        const subject = await Subject.find(id)
+        await subject.delete()
 
 
     }
