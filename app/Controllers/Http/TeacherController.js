@@ -1,9 +1,11 @@
 'use strict'
 
+
+
 const Database = use('Database')
 const Hash = use('Hash')
 const Validator = use("Validator")
-
+const Teacher = use('App/Models/Teacher')
 
 function numberTypeParamValidator(number){
     if (Number.isNaN(parseInt(number))) 
@@ -14,30 +16,32 @@ function numberTypeParamValidator(number){
 
 
 class TeacherController {
+    
     async index() {
-        const teachers = await Database.table('teachers')
-
-        return { status: 200, error: undefined , data: teachers
-         }
+        
+      
+        const teachers = Teacher.query()
+        
+        return { status: 200, error: undefined , data: await teachers.fetch() }
     }
+
+
     async show({ request }){
         const { id } = request.params
-
         const validatedValue = numberTypeParamValidator(id)
 
         if (validatedValue.error) 
             return { status: 500, error: validatedValue.error, data: undefined }
 
-        const teacher = await Database
-            .select('*')
-            .from('teachers')
-            .where("teacher_id",id)
-            .first()
+    
+        const teacher = await Teacher.find(id)    
 
         return { status: 200, error: undefined , data: teacher || {} }
         
     }
+
     async store ({request}) {
+
         const { first_name , last_name , email , password }  = request.body
 
         
@@ -52,14 +56,16 @@ class TeacherController {
         if(validation.fails())
             return {status:422,error: validation.messages(),data: undefined}
 
-
-            
+    
         const hashedPassword = await Hash.make(password)
-        const teacher = await Database
-            .table('teachers')
-            .insert({first_name,last_name,email,password: hashedPassword })
+        
+        const teacher = new Teacher();
+        teacher.first_name =first_name;
+        teacher.last_name = last_name;
+        teacher.email = email;
+        teacher.password = hashedPassword;
 
-        return teacher
+        await teacher.save()
     }
     async update ({request}){
 
@@ -67,26 +73,16 @@ class TeacherController {
         const {id} =params
         const { first_name , last_name , email } = body
 
-        const teacherId = await Database
-            .table('teachers')
-            .where({teacher_id: id})
-            .update({ first_name , last_name , email})
- 
-        const teacher = await Database
-            .table('teachers')
-            .where({teacher_id: teacherId})
-            .first()
-
-            return {status: 200 , error: undefined, data: teacher
-            }
+        
+        const teacher = await Teacher.find(id)
+        teacher.merge({first_name , last_name , email});
+        await teacher.save()        
 
     }
     async destroy ({request}){
         const {id} = request.params
-
-        await Database.table('teachers').where({teacher_id: id }).delete()
-        return {status: 200,error: undefined, data: {message: 'success'}}
-
+        const teacher = await Teacher.find(id)
+        await teacher.delete()
 
     }
 
