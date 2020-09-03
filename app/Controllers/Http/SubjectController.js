@@ -37,8 +37,14 @@ class SubjectController {
         if (validatedValue.error) 
             return { status: 500, error: validatedValue.error, data: undefined }
 
-        const subject = await Subject.find(id)
-    
+        const {references = undefined} =request.qs
+        const subject =  Subject.query()
+
+        if (references){
+            const extractedReferences = references.split(",")
+            subject.with(extractedReferences)
+        }
+        subject = await Subject.find(id)
 
 
         return { status: 200, error: undefined , data: subject || {} }
