@@ -36,7 +36,15 @@ class EnrollmentController {
         if (validatedValue.error) 
             return { status: 500, error: validatedValue.error, data: undefined }
 
-        const enrollment = await Enrollment.find(id)
+       let enrollment =  Enrollment.query()
+
+        if (references){
+            const extractedReferences = references.split(",")
+            enrollment.with(extractedReferences)
+        }
+
+        enrollment = await Enrollment.find(id)
+
 
         return { status: 200, error: undefined , data: enrollment || {} }
         
