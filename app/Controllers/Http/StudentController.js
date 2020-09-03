@@ -36,10 +36,18 @@ class StudentController {
 
         const validatedValue = numberTypeParamValidator(id)
 
-        if (validatedValue.error) 
-            return { status: 500, error: validatedValue.error, data: undefined }
+            if (validatedValue.error) 
+                return { status: 500, error: validatedValue.error, data: undefined }
+        
+        const {references = undefined} =request.qs
+        let student =  Student.query()
+    
+            if (references){
+                const extractedReferences = references.split(",")
+                student.with(extractedReferences)
+            }
 
-        const student = await Student.find(id)
+        student = await Student.find(id)
 
         return { status: 200, error: undefined , data: student || {} }
         
