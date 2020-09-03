@@ -31,6 +31,7 @@ Route.group(() => {
   Route.resource('/enrollments','EnrollmentController')
   Route.resource('/subjects','SubjectController')
 
+  Route.get('/subjects/:id/teacher','SubjectController.showTeacher')
 
   // Route.get('/teachers','TeacherController.index')
   // Route.get('/teachers/:id','TeacherController.show')
